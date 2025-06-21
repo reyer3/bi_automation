@@ -1,0 +1,16 @@
+# Datos persistentes
+postgres/data/
+redis/data/
+
+# Certificados SSL generados
+postgres/ssl/*.crt
+postgres/ssl/*.key
+postgres/ssl/*.pem
+
+# Logs
+*.log
+
+# Archivos temporales
+*.tmp
+*.swp
+*~
