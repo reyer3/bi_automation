@@ -1,0 +1,44 @@
+version: '3.8'
+
+volumes:
+  postgres_data:
+    external: false
+
+services:
+  postgres:
+    build:
+      context: .
+      dockerfile: postgres.Dockerfile
+    container_name: postgres_prod
+    restart: unless-stopped
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?database password required}
+      - POSTGRES_MULTIPLE_DATABASES=n8n_database,evolution_database,chatwoot,talento_chats,superset
+    volumes:
+      - postgres_data:/home/postgres/pgdata/data
+      - ./init/init-multiple-dbs.sh:/docker-entrypoint-initdb.d/init-multiple-dbs.sh
+      - ./init/init-ssl.sh:/docker-entrypoint-initdb.d/init-ssl.sh
+      - ./init/docker-init.sh:/docker-init.sh
+      - ./ssl:/var/lib/postgresql/ssl:rw
+    ports:
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 2G
+      restart_policy:
+        condition: on-failure
+    entrypoint: ["/docker-init.sh"]
+    networks:
+      - prod_backend
+
+networks:
+  prod_backend:
+    external: true

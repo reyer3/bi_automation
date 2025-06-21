@@ -1,0 +1,2 @@
+# Directorio para certificados SSL
+# Los certificados se generan automáticamente al iniciar el contenedor
