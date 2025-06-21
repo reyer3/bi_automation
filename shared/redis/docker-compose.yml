@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: redis_prod
+    restart: always
+    command: redis-server --requirepass ${REDIS_PASSWORD:?redis password required} --appendonly yes --bind 0.0.0.0
+    volumes:
+      - ./data:/data
+    ports:
+      - "127.0.0.1:6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
+    networks:
+      - prod_backend
+
+networks:
+  prod_backend:
+    external: true
